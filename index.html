@@ -100,7 +100,7 @@ var stationsPoints = rect.append("svg:g")
 	  .style("stroke-width", 1)
 	  .attr("d", parksPath);
 	}); */
-  d3.json("../data/District.geojson", function(collection) {
+  d3.json("./data/District.geojson", function(collection) {
     District.selectAll("#District")
     .data(collection.features)
     .enter().append("svg:path", "District")
@@ -109,7 +109,7 @@ var stationsPoints = rect.append("svg:g")
 	  .attr("d", DistrictPath);
   });
 
-  d3.json("../data/waterways.geojson", function(collection) {
+  d3.json("./data/waterways.geojson", function(collection) {
   	  waterways.selectAll("#waterwaysLines")
   	    .data(collection.features)
   	    .enter().append("svg:path","waterwaysLines")
@@ -119,7 +119,7 @@ var stationsPoints = rect.append("svg:g")
   	    .attr("d", path);
   	});
 
-    d3.json("../data/waterareas.geojson", function(collection) {
+    d3.json("./data/waterareas.geojson", function(collection) {
       waterareas.selectAll("#waterareas")
       .data(collection.features)
       .enter().append("svg:path", "waterareas")
@@ -129,7 +129,7 @@ var stationsPoints = rect.append("svg:g")
     });
 
 
-d3.json("../data/Road1.geojson", function(collection) {
+d3.json("./data/Road1.geojson", function(collection) {
 	  streets.selectAll("#streetsLines")
 	    .data(collection.features)
 	    .enter().append("svg:path","streetsLines")
@@ -141,7 +141,7 @@ d3.json("../data/Road1.geojson", function(collection) {
 
 
 //loading stations CSV
-d3.tsv("../data/DSVyborka.csv", function(d,i) {
+d3.tsv("./data/DSVyborka.csv", function(d,i) {
 
 	//getting lonlat
   var lon = d.lon.replace(",",".");
