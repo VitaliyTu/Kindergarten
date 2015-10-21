@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>bike stations</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<style>
+
+body {
+  margin: 0;
+  background: #222;
+  min-width: 600px;
+  font-family: Helvetica, Arial, Sans-Serif;
+  color: #aaa;
+  font-size: 15px;
+}
+
+
+a ,a:visited {
+	color: #ccc;
+}
+
+rect {
+  fill: none;
+  pointer-events: all;
+}
+
+circle {
+  fill: none;
+  stroke-width: 2.5px;
+}
+
+#page {
+	display: block;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+}
+</style>
+<body>
+<div id="content"></div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+
+<script>
+
+var width = 1000, height = 850;
+//var stations = [], stationsPositions = [], stationsIndex = [];
+var body = d3.select("body");
+
+var svg = d3.select("#content")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+
+//viewport area in coordinates
+var extent = [[37.51,55.65],[-37.70,55.81]];
+
+//specifying projection
+var projection = d3.geo.mercator()
+	.center([37.5078,55.70000])
+	.scale(200000);
+
+var path = d3.geo.path()
+		.projection(projection);
+
+var DistrictPath = d3.geo.path()
+		.projection(projection);
+
+
+//setting the area
+var rect = svg.append("svg:g")
+	.attr("width", width)
+	.attr("height", height)
+	.attr("id", "rect");
+
+var District = rect.append("svg:g")
+	.attr("id", "District");
+
+var streets = rect.append("svg:g")
+	.attr("id", "streets");
+
+var waterareas = rect.append("svg:g")
+  .attr("id", "waterareas");
+
+var waterways = rect.append("svg:g")
+  .attr("id", "waterways");
+
+var stationsPoints = rect.append("svg:g")
+	.attr("id", "stations");
+
+
+//loading
+/* d3.json("../data/parks.geojson", function(collection) {
+	parks.selectAll("#parks")
+	  .data(collection.features)
+	  .enter().append("svg:path","parks")
+	  .attr("fill", "rgba(0,100,15,0.5)")
+	  .style("stroke-width", 1)
+	  .attr("d", parksPath);
+	}); */
+  d3.json("../data/District.geojson", function(collection) {
+    District.selectAll("#District")
+    .data(collection.features)
+    .enter().append("svg:path", "District")
+    .attr("fill", "rgba(255,255,255,0.1)")
+	  .style("stroke-width", 1)
+	  .attr("d", DistrictPath);
+  });
+
+  d3.json("../data/waterways.geojson", function(collection) {
+  	  waterways.selectAll("#waterwaysLines")
+  	    .data(collection.features)
+  	    .enter().append("svg:path","waterwaysLines")
+  		.attr("fill", "none")
+  		.style("stroke", "rgba(25,170,240,0.9)")
+  		.style("stroke-width", 1.5)
+  	    .attr("d", path);
+  	});
+
+    d3.json("../data/waterareas.geojson", function(collection) {
+      waterareas.selectAll("#waterareas")
+      .data(collection.features)
+      .enter().append("svg:path", "waterareas")
+      .attr("fill", "rgba(25,170,240,0.9)")
+      .style("stroke-width", 1)
+      .attr("d", path);
+    });
+
+
+d3.json("../data/Road1.geojson", function(collection) {
+	  streets.selectAll("#streetsLines")
+	    .data(collection.features)
+	    .enter().append("svg:path","streetsLines")
+		.attr("fill", "none")
+		.style("stroke", "rgba(140,140,140,0.25)")
+		.style("stroke-width", 1.5)
+	    .attr("d", path);
+	});
+
+
+//loading stations CSV
+d3.tsv("../data/DSVyborka.csv", function(d,i) {
+
+	//getting lonlat
+  var lon = d.lon.replace(",",".");
+  var lat = d.lat.replace(",",".");
+
+	var location = projection([lon, lat]);
+	var fill = d3.rgb(48,196,196); //d3.hsl((i = (i*3) % 360), 1, .5);
+	console.log(location);
+
+	stationsPoints.append("circle", "stationsPoints")
+       .attr("cx", location[0])
+       .attr("cy", location[1])
+	   .style("fill", fill)
+     .style("opacity", 0.5)
+	   .style("stroke-width", 0)
+	   .style("cursor", "pointer")
+     .attr("r", 10)
+ 	   .on("mouseenter", function(z){
+		   d3.select(this)
+		   .transition()
+		   .duration(800)
+		   .ease("bounce")
+		   .attr("r", 30);
+	   })
+     .on("mouseout", function(z){
+     d3.select(this)
+     .transition()
+     .duration(800)
+     .ease("bounce")
+     .attr("r", 10);
+    })
+    var lon2 = d.lon2;
+    var lat2 = d.lat2;
+
+    var location = projection([lon2, lat2]);
+    var fill = d3.rgb(255,255,255); //d3.hsl((i = (i*3) % 360), 1, .5);
+    console.log(location);
+
+    stationsPoints.append("circle", "metroPoints")
+         .attr("cx", location[0])
+         .attr("cy", location[1])
+
+         .style("fill", fill)
+         .style("opacity", 0.5)
+         .style("stroke-width", 0)
+         .style("cursor", "pointer")
+         .attr("r", 4);
+
+  /* text.append('text')
+    .text(function(d) { return d.metroname; })
+    .attr("cx", location[0])
+    .attr("cy", location[1])
+    .style("fill", fill)
+    .style("opacity", 0.9)
+    */
+		/*.on("click", function(z){
+ 		   d3.select(this)
+ 		   .transition()
+ 		   .duration(500)
+ 		   .ease(Math.sqrt)
+ 		   //.style("opacity", .8)
+ 		   .attr("r", 10*20)
+		   .style("opacity", 0)
+ 		   .transition()
+ 		   .duration(500)
+		   .ease("bounce")
+		   .attr("r", 10)
+		   .style("opacity", 1);
+	   }); */
+
+   },
+   function(d){
+        // data imported
+	}
+/*function(d,i) {
+
+  	//getting lonlat
+    var lon2 = d.lon2;
+    var lat2 = d.lat2;
+
+  	var location = projection([lon2, lat2]);
+  	var fill = d3.rgb(255,255,255); //d3.hsl((i = (i*3) % 360), 1, .5);
+  	console.log(location);
+
+  	stationsPoints.append("circle", "metroPoints")
+         .attr("cx", location[0])
+         .attr("cy", location[1])
+  	   .style("fill", fill)
+       .style("opacity", 0.5)
+  	   .style("stroke-width", 0)
+  	   .style("cursor", "pointer")
+       .attr("r", 2)
+     }
+     */
+
+	);
+
+</script>
+</body>
+</html>
